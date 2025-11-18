@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservas Esmeraldas</title>
+  <meta name="description" content="App de reservas para Esmeraldas: hoteles, restaurantes, clínicas, tiendas, farmacias, barberías y peluquerías">
+  <meta name="theme-color" content="#0d8a63">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <style>
+    :root { --verde-esmeralda: #0d8a63; --azul-pacifico: #1e56a0; --arena-playa: #e6d3b3; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:sans-serif; background:#f8f9fa; color:#333; }
+    #splash { position:fixed; inset:0; background:linear-gradient(rgba(13,138,99,0.7),rgba(30,86,160,0.7)),url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><path fill="%23e6d3b3" d="M0,300 Q300,200 600,300 T1200,300 L1200,600 L0,600 Z"/></svg>') center/cover; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; padding:20px; z-index:1000; }
+    .logo { width:80px; height:80px; background:white; border-radius:50%; display:flex; justify-content:center; align-items:center; margin:0 auto 20px; }
+    .logo::before { content:"RE"; font-size:28px; font-weight:bold; color:var(--verde-esmeralda); }
+    .btn { padding:14px 24px; border:none; border-radius:10px; font-size:18px; font-weight:bold; cursor:pointer; margin:8px; }
+    .btn-cliente { background:white; color:var(--verde-esmeralda); }
+    .btn-proveedor { background:var(--verde-esmeralda); color:white; }
+    #app { display:none; flex-direction:column; min-height:100vh; }
+    header { background:white; padding:14px 16px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+    .logo-icon { width:36px; height:36px; background:var(--verde-esmeralda); border-radius:8px; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold; }
+    .tabs { display:flex; gap:10px; overflow-x:auto; padding:10px 0 20px; }
+    .tab { flex:0 0 auto; width:70px; height:90px; border-radius:12px; overflow:hidden; position:relative; color:white; font-size:11px; display:flex; flex-direction:column; justify-content:flex-end; padding:6px 2px; text-align:center; }
+    .tab-bg { position:absolute; top:0; left:0; width:100%; height:100%; background:#1e56a0; }
+    .tab[data-section="hoteles"] .tab-bg { background:#9b59b6; }
+    .tab[data-section="clinicas"] .tab-bg { background:#3498db; }
+    .tab[data-section="ropa"] .tab-bg { background:#e74c3c; }
+    .tab[data-section="farmacias"] .tab-bg { background:#2ecc71; }
+    .tab[data-section="barberia"] .tab-bg { background:#f39c12; }
+    .tab::after { content:''; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); }
+    .businesses-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:16px; padding:0 16px 20px; }
+    .business-card { background:white; border-radius:12px; overflow:hidden; box-shadow:0 3px 8px rgba(0,0,0,0.1); cursor:pointer; }
+    .business-img { width:100%; height:90px; background:#ccc; }
+    .business-info { padding:10px; }
+    .section { display:none; padding:20px; }
+    .section.active { display:block; }
+    .provider-login { max-width:400px; margin:40px auto; background:white; border-radius:16px; padding:30px; box-shadow:0 6px 20px rgba(0,0,0,0.1); }
+    input, select { width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:16px; margin:6px 0; }
+    .inventory-list { margin-top:20px; }
+    .inventory-item { background:#f8f9fa; padding:12px; border-radius:8px; margin:8px 0; }
+  </style>
+</head>
+<body>
+  <div id="splash">
+    <div class="logo"></div>
+    <h1 style="font-size:28px; font-weight:bold; margin-bottom:12px;">Reservas Esmeraldas</h1>
+    <p style="max-width:400px; opacity:0.9; margin-bottom:24px;">Tu app todo-en-uno para reservar y gestionar negocios en Esmeraldas</p>
+    <button class="btn btn-cliente" onclick="showSection('home-clientes')">👤 Clientes</button>
+    <button class="btn btn-proveedor" onclick="showSection('login-proveedor')">🏪 Proveedores</button>
+  </div>
+
+  <div id="app">
+    <header>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div class="logo-icon">RE</div>
+        <div>
+          <div style="font-size:18px; font-weight:bold;">Reservas Esmeraldas</div>
+          <div style="font-size:13px; color:#1e56a0;">📍 Esmeraldas, Ecuador</div>
+        </div>
+      </div>
+    </header>
+
+    <div id="home-clientes" class="section">
+      <h2 style="font-size:22px; margin:0 0 16px;">¿Qué deseas reservar hoy?</h2>
+      <div class="tabs">
+        <div class="tab" data-section="restaurantes" onclick="renderBusinesses('restaurantes')">
+          <div class="tab-bg"></div>
+          <div>🍽️<br>Restaurantes</div>
+        </div>
+        <div class="tab" data-section="hoteles" onclick="renderBusinesses('hoteles')">
+          <div class="tab-bg"></div>
+          <div>🏨<br>Hoteles</div>
+        </div>
+        <div class="tab" data-section="clinicas" onclick="renderBusinesses('clinicas')">
+          <div class="tab-bg"></div>
+          <div>🏥<br>Clínicas</div>
+        </div>
+        <div class="tab" data-section="ropa" onclick="renderBusinesses('ropa')">
+          <div class="tab-bg"></div>
+          <div>👕<br>Tiendas</div>
+        </div>
+        <div class="tab" data-section="farmacias" onclick="renderBusinesses('farmacias')">
+          <div class="tab-bg"></div>
+          <div>💊<br>Farmacias</div>
+        </div>
+        <div class="tab" data-section="barberia" onclick="renderBusinesses('barberia')">
+          <div class="tab-bg"></div>
+          <div>✂️<br>Barberías</div>
+        </div>
+      </div>
+      <div class="businesses-grid" id="businesses-container"></div>
+    </div>
+
+    <div id="login-proveedor" class="section">
+      <div class="provider-login">
+        <h2 style="text-align:center; color:var(--verde-esmeralda);">🔐 Acceso para proveedores</h2>
+        <p style="text-align:center; color:#666; margin-bottom:20px;">Ingresa tu código único (4-6 dígitos)</p>
+        <input type="text" id="codigo-acceso" placeholder="Ej: 1234 o MODA" maxlength="6">
+        <button class="btn btn-cliente" style="width:100%; background:var(--verde-esmeralda); color:white;" onclick="accederProveedor()">✅ Acceder</button>
+        <button class="btn" style="width:100%; background:#eee; color:#333; margin-top:10px;" onclick="showSection('home-clientes')">← Volver</button>
+      </div>
+    </div>
+
+    <div id="provider-section" class="section">
+      <div style="max-width:500px; margin:0 auto;">
+        <div style="background:var(--verde-esmeralda); color:white; padding:20px; border-radius:12px; text-align:center; margin-bottom:20px;">
+          <h2 id="provider-title">Panel de Gestión</h2>
+        </div>
+        <input type="text" id="prod-nombre" placeholder="Nombre del producto/servicio">
+        <input type="text" id="prod-precio" placeholder="Precio (ej: $15)">
+        <select id="prod-dispo">
+          <option>Disponible hoy</option>
+          <option>Con cita previa</option>
+          <option>Agotado</option>
+        </select>
+        <textarea id="prod-desc" placeholder="Descripción (opcional)" style="height:60px;"></textarea>
+        <button class="btn" style="background:var(--verde-esmeralda); color:white; width:100%;" onclick="addOffer()">✅ Agregar</button>
+        <h3 style="margin:20px 0 12px;">Mi catálogo</h3>
+        <div id="inventory-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const negocios = {
+      restaurantes: [{nombre:"Sabores del Pacífico",ubicacion:"Same",token:"1234",ofertas:[{nombre:"Ceviche",precio:"$16",dispo:"Hoy"}]}],
+      barberia: [{nombre:"Estilo Costeño",ubicacion:"Esmeraldas",token:"5678",ofertas:[{nombre:"Corte",precio:"$8",dispo:"Con cita"}]}],
+      ropa: [{nombre:"Modas Esmeralda",ubicacion:"Atacames",token:"MODA",ofertas:[{nombre:"Vestido",precio:"$25",dispo:"Hoy"}]}]
+    };
+
+    function showSection(id) {
+      document.getElementById('splash').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      if (id) document.getElementById(id).classList.add('active');
+      if (id === 'home-clientes') renderBusinesses('restaurantes');
+    }
+
+    function renderBusinesses(sector) {
+      const container = document.getElementById('businesses-container');
+      const lista = negocios[sector] || [];
+      container.innerHTML = lista.map(n => 
+        `<div class="business-card" onclick="alert('Reserva para: ${n.nombre}')">
+          <div class="business-img" style="background:#${sector==='barberia'?'f39c12':sector==='restaurantes'?'1e56a0':'ccc'}"></div>
+          <div class="business-info">
+            <div style="font-weight:bold;">${n.nombre}</div>
+            <div>📍 ${n.ubicacion}</div>
+          </div>
+        </div>`
+      ).join('');
+    }
+
+    function accederProveedor() {
+      const token = document.getElementById('codigo-acceso').value?.toUpperCase();
+      const result = Object.values(negocios).flat().find(n => n.token === token);
+      if (result) {
+        document.getElementById('provider-title').textContent = result.nombre;
+        renderInventory(result);
+        showSection('provider-section');
+      } else {
+        alert("❌ Código incorrecto");
+      }
+    }
+
+    function renderInventory(negocio) {
+      document.getElementById('inventory-list').innerHTML = 
+        negocio.ofertas.map((o,i) => 
+          `<div class="inventory-item">
+            ${o.nombre} — ${o.precio}<br>
+            <small>${o.dispo}</small><br>
+            <button onclick="deleteOffer(${i})">🗑️ Eliminar</button>
+          </div>`
+        ).join('') || '<p style="text-align:center;color:#888;">Sin productos</p>';
+    }
+
+    function addOffer() {
+      const token = document.getElementById('codigo-acceso').value?.toUpperCase();
+      const negocio = Object.values(negocios).flat().find(n => n.token === token);
+      if (!negocio) return;
+      negocio.ofertas.push({
+        nombre: document.getElementById('prod-nombre').value || 'Nuevo',
+        precio: document.getElementById('prod-precio').value || '$0',
+        dispo: document.getElementById('prod-dispo').value
+      });
+      renderInventory(negocio);
+      alert("✅ Agregado");
+    }
+
+    function deleteOffer(index) {
+      const token = document.getElementById('codigo-acceso').value?.toUpperCase();
+      const negocio = Object.values(negocios).flat().find(n => n.token === token);
+      if (negocio) negocio.ofertas.splice(index, 1);
+      renderInventory(negocio);
+    }
+  </script>
+</body>
+</html>
