@@ -9,10 +9,10 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon-192.png">
   <style>
-    :root { --verde-esmeralda: #0d8a63; --azul-pacifico: #1e56a0; --arena-playa: #e6d3b3; }
+    :root { --verde-esmeralda: #0d8a63; }
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family:sans-serif; background:#f8f9fa; color:#333; }
-    #splash { position:fixed; inset:0; background:linear-gradient(rgba(13,138,99,0.7),rgba(30,86,160,0.7)),url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><path fill="%23e6d3b3" d="M0,300 Q300,200 600,300 T1200,300 L1200,600 L0,600 Z"/></svg>') center/cover; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; padding:20px; z-index:1000; }
+    #splash { position:fixed; inset:0; background:linear-gradient(rgba(13,138,99,0.8),rgba(30,86,160,0.8)),url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><path fill="%23e6d3b3" d="M0,300 Q300,200 600,300 T1200,300 L1200,600 L0,600 Z"/></svg>') center/cover; display:flex; flex-direction:column; justify-content:center; align-items:center; color:white; text-align:center; padding:20px; z-index:1000; }
     .logo { width:80px; height:80px; background:white; border-radius:50%; display:flex; justify-content:center; align-items:center; margin:0 auto 20px; }
     .logo::before { content:"RE"; font-size:28px; font-weight:bold; color:var(--verde-esmeralda); }
     .btn { padding:14px 24px; border:none; border-radius:10px; font-size:18px; font-weight:bold; cursor:pointer; margin:8px; }
@@ -22,24 +22,18 @@
     header { background:white; padding:14px 16px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
     .logo-icon { width:36px; height:36px; background:var(--verde-esmeralda); border-radius:8px; display:flex; justify-content:center; align-items:center; color:white; font-weight:bold; }
     .tabs { display:flex; gap:10px; overflow-x:auto; padding:10px 0 20px; }
-    .tab { flex:0 0 auto; width:70px; height:90px; border-radius:12px; overflow:hidden; position:relative; color:white; font-size:11px; display:flex; flex-direction:column; justify-content:flex-end; padding:6px 2px; text-align:center; }
-    .tab-bg { position:absolute; top:0; left:0; width:100%; height:100%; background:#1e56a0; }
-    .tab[data-section="hoteles"] .tab-bg { background:#9b59b6; }
-    .tab[data-section="clinicas"] .tab-bg { background:#3498db; }
-    .tab[data-section="ropa"] .tab-bg { background:#e74c3c; }
-    .tab[data-section="farmacias"] .tab-bg { background:#2ecc71; }
-    .tab[data-section="barberia"] .tab-bg { background:#f39c12; }
-    .tab::after { content:''; position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.3); }
+    .tab { flex:0 0 auto; width:70px; height:90px; border-radius:12px; overflow:hidden; position:relative; color:white; font-size:11px; display:flex; flex-direction:column; justify-content:flex-end; padding:6px 2px; text-align:center; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+    .tab-img { position:absolute; top:0; left:0; width:100%; height:100%; object-fit:cover; }
     .businesses-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:16px; padding:0 16px 20px; }
     .business-card { background:white; border-radius:12px; overflow:hidden; box-shadow:0 3px 8px rgba(0,0,0,0.1); cursor:pointer; }
     .business-img { width:100%; height:90px; background:#ccc; }
-    .business-info { padding:10px; }
+    .business-info { padding:10px; font-size:13px; }
     .section { display:none; padding:20px; }
     .section.active { display:block; }
     .provider-login { max-width:400px; margin:40px auto; background:white; border-radius:16px; padding:30px; box-shadow:0 6px 20px rgba(0,0,0,0.1); }
     input, select { width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:16px; margin:6px 0; }
     .inventory-list { margin-top:20px; }
-    .inventory-item { background:#f8f9fa; padding:12px; border-radius:8px; margin:8px 0; }
+    .inventory-item { background:#f8f9fa; padding:12px; border-radius:8px; margin:8px 0; font-size:14px; }
   </style>
 </head>
 <body>
@@ -65,29 +59,17 @@
     <div id="home-clientes" class="section">
       <h2 style="font-size:22px; margin:0 0 16px;">¿Qué deseas reservar hoy?</h2>
       <div class="tabs">
-        <div class="tab" data-section="restaurantes" onclick="renderBusinesses('restaurantes')">
-          <div class="tab-bg"></div>
-          <div>🍽️<br>Restaurantes</div>
+        <div class="tab" onclick="renderBusinesses('restaurantes')">
+          <img class="tab-img" src="data:image/png;base64,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" alt="Restaurantes">
+          <div>🍽️ Restaurantes</div>
         </div>
-        <div class="tab" data-section="hoteles" onclick="renderBusinesses('hoteles')">
-          <div class="tab-bg"></div>
-          <div>🏨<br>Hoteles</div>
+        <div class="tab" onclick="renderBusinesses('hoteles')">
+          <img class="tab-img" src="data:image/png;base64,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" alt="Hoteles">
+          <div>🏨 Hoteles</div>
         </div>
-        <div class="tab" data-section="clinicas" onclick="renderBusinesses('clinicas')">
-          <div class="tab-bg"></div>
-          <div>🏥<br>Clínicas</div>
-        </div>
-        <div class="tab" data-section="ropa" onclick="renderBusinesses('ropa')">
-          <div class="tab-bg"></div>
-          <div>👕<br>Tiendas</div>
-        </div>
-        <div class="tab" data-section="farmacias" onclick="renderBusinesses('farmacias')">
-          <div class="tab-bg"></div>
-          <div>💊<br>Farmacias</div>
-        </div>
-        <div class="tab" data-section="barberia" onclick="renderBusinesses('barberia')">
-          <div class="tab-bg"></div>
-          <div>✂️<br>Barberías</div>
+        <div class="tab" onclick="renderBusinesses('barberia')">
+          <img class="tab-img" src="data:image/png;base64,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" alt="Barbería">
+          <div>✂️ Barberías</div>
         </div>
       </div>
       <div class="businesses-grid" id="businesses-container"></div>
@@ -98,8 +80,8 @@
         <h2 style="text-align:center; color:var(--verde-esmeralda);">🔐 Acceso para proveedores</h2>
         <p style="text-align:center; color:#666; margin-bottom:20px;">Ingresa tu código único (4-6 dígitos)</p>
         <input type="text" id="codigo-acceso" placeholder="Ej: 1234 o MODA" maxlength="6">
-        <button class="btn btn-cliente" style="width:100%; background:var(--verde-esmeralda); color:white;" onclick="accederProveedor()">✅ Acceder</button>
-        <button class="btn" style="width:100%; background:#eee; color:#333; margin-top:10px;" onclick="showSection('home-clientes')">← Volver</button>
+        <button class="btn btn-cliente" style="background:var(--verde-esmeralda); color:white; width:100%;" onclick="accederProveedor()">✅ Acceder</button>
+        <button class="btn" style="background:#eee; color:#333; width:100%; margin-top:10px;" onclick="showSection('home-clientes')">← Volver</button>
       </div>
     </div>
 
@@ -143,7 +125,7 @@
       const lista = negocios[sector] || [];
       container.innerHTML = lista.map(n => 
         `<div class="business-card" onclick="alert('Reserva para: ${n.nombre}')">
-          <div class="business-img" style="background:#${sector==='barberia'?'f39c12':sector==='restaurantes'?'1e56a0':'ccc'}"></div>
+          <div class="business-img" style="background:${sector==='barberia'?'#f39c12':sector==='restaurantes'?'#1e56a0':'#e74c3c'}"></div>
           <div class="business-info">
             <div style="font-weight:bold;">${n.nombre}</div>
             <div>📍 ${n.ubicacion}</div>
